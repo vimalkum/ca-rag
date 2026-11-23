@@ -1,0 +1,58 @@
+# CA-RAG — requirements.txt
+# Streamlit Community Cloud compatible
+
+# Core
+streamlit>=1.35.0
+
+# LangChain — split packages (v0.2+ layout)
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-community>=0.2.0
+langchain-huggingface>=0.0.3
+langchain-text-splitters>=0.2.0
+langchain-groq>=0.1.6
+
+# Groq API
+groq>=0.9.0
+
+# Transformers / embeddings
+transformers>=4.40.0
+accelerate>=0.30.0
+sentencepiece>=0.2.0
+tokenizers>=0.19.0
+sentence-transformers>=2.7.0
+
+# Vector store
+faiss-cpu>=1.8.0
+
+# PDF
+pypdf>=4.0.0
+reportlab>=4.0.0
+PyPDF2>=3.0.0
+
+# Evaluation
+rouge-score>=0.1.2
+scikit-learn>=1.4.0
+numpy>=1.26.0
+
+# RLHF
+trl>=0.8.0
+datasets>=2.19.0
+wandb>=0.17.0
+
+# NLP
+nltk>=3.8.1
+rapidfuzz>=3.9.0
+
+# Torch (CPU wheel)
+torch>=2.2.0
+torchvision>=0.17.0
+
+# Knowledge graph / ontology
+rdflib>=7.0.0
+
+# Misc
+pandas>=2.2.0
+plotly>=5.22.0
+openai>=1.0.0
+deepeval>=0.21.0

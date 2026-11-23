@@ -1,0 +1,23 @@
+Interpretation Table: Defines key legal and technical terms (e.g., Data Controller, GDPR, DPIA) used throughout the agreement.
+Glossary: Lists acronyms and abbreviations to help readers understand shortened terms.
+Data Sharing Agreement (Parties & Roles): Identifies the parties involved, their addresses, and assigns the Lead Agency.
+Evaluation for a Data Protection Impact Assessment (DPIA): Assesses whether the data sharing poses high risks to individuals and if a DPIA is legally required.
+Purpose of the Data Sharing: Explains why data is being shared and links it to specific public functions or services.
+Data to be Shared: Details the exact personal and non-personal data fields being exchanged.
+Function of the Parties: Clarifies each party’s role and responsibility in relation to the shared data.
+Legal Basis: Sets out the legal grounds (GDPR articles, Acts, Regulations) that justify the data sharing.
+Impetus for Data Sharing: Describes the practical or policy need driving the data exchange.
+Categories of Data Shared: Classifies data types (e.g., identifiers, contact data, educational data).
+Duration and Frequency: States how long the agreement lasts and how often data will be shared.
+How Data Will Be Processed: Explains handling procedures, workflows, and processing steps once data is received.
+Restrictions: Lists limits on data use, onward sharing, and purpose limitation.
+Security Measures: Outlines technical and organisational safeguards protecting the data.
+Retention: Specifies how long data will be kept before deletion.
+Methods Used to Destroy/Delete Data: Describes secure deletion or destruction processes.
+Withdrawal from Agreement: Explains how a party can exit the agreement and consequences of withdrawal.
+Other Matters: Covers miscellaneous legal clauses (governing law, amendments, audits).
+Schedule A – Data Protection Impact Assessment: Provides the DPIA summary or detailed assessment.
+Schedule B: Contains supplementary operational or data-specific details.
+Schedule C: Includes additional technical, legal, or procedural appendices.
+Authorised Signatory:Formal signatures confirming approval of the agreement.
+Data Protection Officers’ Statement:Confirmation from DPOs that data protection obligations have been reviewed.

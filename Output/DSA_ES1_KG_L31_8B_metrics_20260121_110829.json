@@ -1,0 +1,279 @@
+{
+  "calls": [
+    {
+      "stage": "title_generation",
+      "prompt_tokens": 303,
+      "generated_tokens": 250,
+      "total_tokens": 553,
+      "latency_s": 8.435948423109949,
+      "latency_ms": 8435.948423109949,
+      "tflops_est": 0.39331677169937046
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Changes to Data Controller or Processor",
+      "prompt_tokens": 588,
+      "generated_tokens": 250,
+      "total_tokens": 838,
+      "latency_s": 8.768898973241448,
+      "latency_ms": 8768.898973241448,
+      "tflops_est": 0.5733901160616731
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Purpose of the Data Sharing Agreement",
+      "prompt_tokens": 689,
+      "generated_tokens": 250,
+      "total_tokens": 939,
+      "latency_s": 9.146015420090407,
+      "latency_ms": 9146.015420090407,
+      "tflops_est": 0.6160059590129477
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Dispute Resolution",
+      "prompt_tokens": 591,
+      "generated_tokens": 250,
+      "total_tokens": 841,
+      "latency_s": 8.474431896116585,
+      "latency_ms": 8474.431896116585,
+      "tflops_est": 0.5954381440379897
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Purpose of the",
+      "prompt_tokens": 1202,
+      "generated_tokens": 250,
+      "total_tokens": 1452,
+      "latency_s": 9.742792599834502,
+      "latency_ms": 9742.792599834502,
+      "tflops_est": 0.8941994721460034
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Records and Documentation\n\n \n    Response",
+      "prompt_tokens": 578,
+      "generated_tokens": 249,
+      "total_tokens": 827,
+      "latency_s": 8.462544948328286,
+      "latency_ms": 8462.544948328286,
+      "tflops_est": 0.5863484365870585
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Cancellation",
+      "prompt_tokens": 563,
+      "generated_tokens": 249,
+      "total_tokens": 812,
+      "latency_s": 8.617470495868474,
+      "latency_ms": 8617.470495868474,
+      "tflops_est": 0.5653631192976886
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Governance and Oversight",
+      "prompt_tokens": 624,
+      "generated_tokens": 250,
+      "total_tokens": 874,
+      "latency_s": 8.98238150170073,
+      "latency_ms": 8982.38150170073,
+      "tflops_est": 0.5838095385958721
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Term and Termination",
+      "prompt_tokens": 569,
+      "generated_tokens": 250,
+      "total_tokens": 819,
+      "latency_s": 8.612047276925296,
+      "latency_ms": 8612.047276925296,
+      "tflops_est": 0.5705960315808223
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Amendments",
+      "prompt_tokens": 704,
+      "generated_tokens": 250,
+      "total_tokens": 954,
+      "latency_s": 9.18209709180519,
+      "latency_ms": 9182.09709180519,
+      "tflops_est": 0.6233870043814433
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Jurisdiction",
+      "prompt_tokens": 612,
+      "generated_tokens": 250,
+      "total_tokens": 862,
+      "latency_s": 8.956047407817096,
+      "latency_ms": 8956.047407817096,
+      "tflops_est": 0.5774868939936305
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Conflict of Laws",
+      "prompt_tokens": 592,
+      "generated_tokens": 250,
+      "total_tokens": 842,
+      "latency_s": 8.80033824313432,
+      "latency_ms": 8800.33824313432,
+      "tflops_est": 0.5740688437676101
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Relationship with Other Agreements",
+      "prompt_tokens": 572,
+      "generated_tokens": 250,
+      "total_tokens": 822,
+      "latency_s": 8.607961570844054,
+      "latency_ms": 8607.961570844054,
+      "tflops_est": 0.5729579482214616
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Processing Methods and Security Measures",
+      "prompt_tokens": 764,
+      "generated_tokens": 250,
+      "total_tokens": 1014,
+      "latency_s": 8.953483333345503,
+      "latency_ms": 8953.483333345503,
+      "tflops_est": 0.6795120707201552
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Terms and Conditions",
+      "prompt_tokens": 684,
+      "generated_tokens": 250,
+      "total_tokens": 934,
+      "latency_s": 9.149078473914415,
+      "latency_ms": 9149.078473914415,
+      "tflops_est": 0.6125207053341996
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Retention and Disposal",
+      "prompt_tokens": 1211,
+      "generated_tokens": 250,
+      "total_tokens": 1461,
+      "latency_s": 10.052077949978411,
+      "latency_ms": 10052.077949978411,
+      "tflops_est": 0.8720584981156883
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Parties and Responsibilities",
+      "prompt_tokens": 726,
+      "generated_tokens": 250,
+      "total_tokens": 976,
+      "latency_s": 9.212232605554163,
+      "latency_ms": 9212.232605554163,
+      "tflops_est": 0.6356765238938222
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Governing Law",
+      "prompt_tokens": 708,
+      "generated_tokens": 250,
+      "total_tokens": 958,
+      "latency_s": 9.170944381970912,
+      "latency_ms": 9170.944381970912,
+      "tflops_est": 0.6267620607644233
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Entire Agreement",
+      "prompt_tokens": 563,
+      "generated_tokens": 250,
+      "total_tokens": 813,
+      "latency_s": 8.460555936209857,
+      "latency_ms": 8460.555936209857,
+      "tflops_est": 0.5765578570461218
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Minimisation and Anonymisation",
+      "prompt_tokens": 647,
+      "generated_tokens": 250,
+      "total_tokens": 897,
+      "latency_s": 8.973314182832837,
+      "latency_ms": 8973.314182832837,
+      "tflops_est": 0.5997783974059989
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Sharing Agreement Assignment and Subcontracting",
+      "prompt_tokens": 572,
+      "generated_tokens": 248,
+      "total_tokens": 820,
+      "latency_s": 8.772215402685106,
+      "latency_ms": 8772.215402685106,
+      "tflops_est": 0.5608617406378356
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Controller and Processor Roles",
+      "prompt_tokens": 560,
+      "generated_tokens": 250,
+      "total_tokens": 810,
+      "latency_s": 8.60053092520684,
+      "latency_ms": 8600.53092520684,
+      "tflops_est": 0.5650813934935207
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Access and Usage",
+      "prompt_tokens": 748,
+      "generated_tokens": 250,
+      "total_tokens": 998,
+      "latency_s": 9.218291030731052,
+      "latency_ms": 9218.291030731052,
+      "tflops_est": 0.6495781029301182
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Protection and Compliance",
+      "prompt_tokens": 800,
+      "generated_tokens": 250,
+      "total_tokens": 1050,
+      "latency_s": 9.10837554000318,
+      "latency_ms": 9108.37554000318,
+      "tflops_est": 0.6916710858408238
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Subject Rights and Obligations",
+      "prompt_tokens": 783,
+      "generated_tokens": 228,
+      "total_tokens": 1011,
+      "latency_s": 8.605624528136104,
+      "latency_ms": 8605.624528136104,
+      "tflops_est": 0.7048878300659298
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Description and Categories",
+      "prompt_tokens": 637,
+      "generated_tokens": 250,
+      "total_tokens": 887,
+      "latency_s": 8.946966583840549,
+      "latency_ms": 8946.966583840549,
+      "tflops_est": 0.5948384796264092
+    },
+    {
+      "stage": "dsa_generation",
+      "title": "Data Breach Notification and Response",
+      "prompt_tokens": 1211,
+      "generated_tokens": 0,
+      "total_tokens": 1211,
+      "latency_s": 9.94972295500338,
+      "latency_ms": 9949.72295500338,
+      "tflops_est": 0.7302715897578005
+    }
+  ],
+  "totals": {
+    "prompt_tokens": 18801,
+    "generated_tokens": 6474,
+    "total_tokens": 25275,
+    "latency_s": 241.96238967822865
+  }
+}

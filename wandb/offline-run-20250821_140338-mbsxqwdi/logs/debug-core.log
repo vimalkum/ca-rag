@@ -1,0 +1,7 @@
+{"time":"2025-08-21T14:03:38.292857596+01:00","level":"INFO","msg":"main: starting server","port-filename":"/tmp/tmp40ito6mj/port-2555381.txt","pid":2555381,"log-level":0,"disable-analytics":false,"shutdown-on-parent-exit":false,"enable-dcgm-profiling":false}
+{"time":"2025-08-21T14:03:38.293658202+01:00","level":"INFO","msg":"server: accepting connections","addr":{"Name":"/tmp/wandb-2555381-2565761-1863665439/socket","Net":"unix"}}
+{"time":"2025-08-21T14:03:38.293742811+01:00","level":"INFO","msg":"server: will exit if parent process dies","ppid":2555381}
+{"time":"2025-08-21T14:03:38.467334931+01:00","level":"INFO","msg":"connection: ManageConnectionData: new connection created","id":"1(@)"}
+{"time":"2025-08-21T14:03:38.482961931+01:00","level":"INFO","msg":"handleInformInit: received","streamId":"mbsxqwdi","id":"1(@)"}
+{"time":"2025-08-21T14:03:38.637825224+01:00","level":"INFO","msg":"handleInformInit: stream started","streamId":"mbsxqwdi","id":"1(@)"}
+{"time":"2025-08-21T14:13:38.638076275+01:00","level":"INFO","msg":"server: parent process exited, terminating service process"}

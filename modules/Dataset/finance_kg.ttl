@@ -1,0 +1,53 @@
+@prefix ns1: <http://dsagen.org/> .
+@prefix ns2: <http://dsagen.org/%> .
+
+ns2:28ubin ns1:has_retention_period "7_years" .
+
+ns1:affected_party ns1:must_notify "other_party" ;
+    ns1:must_share_details "relevant_details" .
+
+ns1:all_parties ns1:will_apply "gdpr principles, including: lawfulness, fairness, and transparency; purpose limitation; data minimisation; accuracy (including correction and feedback mechanisms where feasible" .
+
+ns1:data_sharing_and_governance_act_2019 ns1:must_be_followed "office of revenue commissioners" .
+
+ns1:department_of_agriculture ns1:food_andmarine "receives, unique business identifier number data" .
+
+ns1:department_of_enterprise ns1:trade_and_employment "receives, unique business identifier number data" .
+
+ns1:general_data_protection_regulation_%28gdpr%29 ns1:must_be_followed "office of revenue commissioners" .
+
+ns1:none ns1:none "none" .
+
+ns1:office_ofrevenue_commissioners ns1:data_controller "unique business identifier number data" ;
+    ns1:ensures "lawful ubin data sharing",
+        "proportionate ubin data sharing",
+        "secure ubin data sharing",
+        "transparent ubin data sharing" ;
+    ns1:shares "unique business identifier number data" .
+
+ns1:recipient_agencies ns1:are_responsible_for "identifying and documenting their own legal basis and statutory powers for receiving and further processing ubin data for their functions" ;
+    ns1:must_apply "retention_periods" ;
+    ns1:must_define "retention_periods" ;
+    ns1:must_maintain "incident_response_procedures",
+        "security controls at least equivalent to those required by its internal security standards and applicable public sector guidance." ;
+    ns1:must_not_onward_share_ubin_data_unless "permitted by law; and documented throughapproved governance route" ;
+    ns1:must_provide "transparency_information" ;
+    ns1:must_record "disposal_actions" ;
+    ns1:must_redirect "data_subject_requests" ;
+    ns1:must_support "data_subject_rights" .
+
+ns1:road_safety_authority ns1:receives "unique business identifier number data" .
+
+ns1:security%29%29 ns2:28ubin_data "will be shared and processed using, appropriate technical and organisational measures, including: secure transmission: tls 1.3 (or equivalent" .
+
+ns1:tailte_%C3%A9ireann_%E2%80%93_valuation ns1:receives "unique business identifier number data" .
+
+ns1:triple%29_%23_print_each_triple_inlist_print%28%29_%23_printempty_line_for_readability_%23_output%3A_%23_%28none ns1:none "none" .
+
+ns1:ubin_data ns1:constitutes "gdpr",
+        "personal_data" ;
+    ns1:must_be_disposed_of "secure_deletion",
+        "secure_destruction",
+        "securely" ;
+    ns1:must_not_be_used_for "unrelated purposes, profiling beyond what is necessary forstated purpose, or any onward disclosure except where permitted by law and documented under section 9" .
+

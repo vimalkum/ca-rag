@@ -1,0 +1,257 @@
+@prefix : <http://example.org/ontologies/DataSharingAgreementOntology#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+
+: a owl:Ontology ;
+  dct:title "Extended Data Sharing Agreement Ontology v2.0" ;
+  dct:description """Comprehensive ontology for Data Sharing Agreements under Data Sharing and Governance Act 2019.
+EXTENDED with data flows, governance, technical specifications, compliance monitoring, audit trails, and risk management.""" .
+
+#################################################################
+# EXTENDED CORE CLASSES
+#################################################################
+
+:DataSharingAgreement a owl:Class ;
+  rdfs:label "Data Sharing Agreement" ;
+  rdfs:comment "Legal agreement between controller(s) and processor(s)/recipient(s)." .
+
+:DataController a owl:Class ;
+  rdfs:label "Data Controller" ;
+  rdfs:comment "Primary entity determining purposes/means of processing (GDPR Art 4(7))." .
+
+:DataProcessor a owl:Class ;
+  rdfs:label "Data Processor" ;
+  rdfs:comment "Entity processing data on behalf of controller (GDPR Art 4(8))." .
+
+:DataRecipient a owl:Class ;
+  rdfs:label "Data Recipient" ;
+  rdfs:comment "Authorised third party receiving shared data." .
+
+:DataFlow a owl:Class ;
+  rdfs:label "Data Flow" ;
+  rdfs:comment "Complete data lifecycle from collection to destruction." .
+
+:PersonalDataCategory a owl:Class ;
+  rdfs:label "Personal Data Category" ;
+  rdfs:comment "GDPR categories: identifiers, contact, financial, health, etc." .
+
+:SpecialCategoryData a owl:Class ;
+  rdfs:subClassOf :PersonalDataCategory ;
+  rdfs:label "Special Category Data" ;
+  rdfs:comment "GDPR Art 9: health, racial origin, political opinions, etc." .
+
+:DataMinimisationRule a owl:Class ;
+  rdfs:label "Data Minimisation Rule" ;
+  rdfs:comment "Principle of necessity and proportionality (GDPR Art 5(1)(c))." .
+
+:DataProcessingAgreement a owl:Class ;
+  rdfs:label "Data Processing Agreement" ;
+  rdfs:comment "Mandatory contract between controller and processor (GDPR Art 28)." .
+
+:AuditTrail a owl:Class ;
+  rdfs:label "Audit Trail" ;
+  rdfs:comment "Complete record of data access, modification, transfer events." .
+
+:ComplianceMonitoring a owl:Class ;
+  rdfs:label "Compliance Monitoring" ;
+  rdfs:comment "Ongoing oversight and assurance activities." .
+
+:RiskAssessment a owl:Class ;
+  rdfs:subClassOf :DataProtectionImpactAssessment ;
+  rdfs:label "Risk Assessment" ;
+  rdfs:comment "Risk identification, analysis, and mitigation planning." .
+
+:TechnicalSpecification a owl:Class ;
+  rdfs:label "Technical Specification" ;
+  rdfs:comment "API endpoints, formats, protocols, authentication methods." .
+
+#################################################################
+# EXTENDED RELATIONSHIPS
+#################################################################
+
+:hasDataController a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataController ;
+  owl:inverseOf :controlsDataSharing .
+
+:hasDataProcessor a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataProcessor ;
+  rdfs:label "has data processor" .
+
+:hasDataRecipient a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataRecipient ;
+  rdfs:label "has data recipient" .
+
+:definesDataFlow a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataFlow ;
+  rdfs:label "defines data flow" .
+
+:containsDataCategory a owl:ObjectProperty ;
+  rdfs:domain :DataToBeShared ;
+  rdfs:range :PersonalDataCategory ;
+  rdfs:label "contains data category" .
+
+:appliesDataMinimisation a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataMinimisationRule ;
+  rdfs:label "applies data minimisation" .
+
+:executedUnderDPA a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataProcessingAgreement ;
+  rdfs:label "executed under DPA" .
+
+:generatesAuditTrail a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :AuditTrail ;
+  rdfs:label "generates audit trail" .
+
+:subjectsToMonitoring a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :ComplianceMonitoring ;
+  rdfs:label "subjects to monitoring" .
+
+:assessesRisks a owl:ObjectProperty ;
+  rdfs:domain :DataProtectionImpactAssessment ;
+  rdfs:range :RiskAssessment ;
+  rdfs:label "assesses risks" .
+
+:implementsSpecification a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :TechnicalSpecification ;
+  rdfs:label "implements specification" .
+
+#################################################################
+# DATA PROPERTIES (EXTENDED)
+#################################################################
+
+:hasDataVolume a owl:DatatypeProperty ;
+  rdfs:domain :DataToBeShared ;
+  rdfs:range xsd:integer ;
+  rdfs:label "has data volume (records)" .
+
+:hasDataFormat a owl:DatatypeProperty ;
+  rdfs:domain :TechnicalSpecification ;
+  rdfs:range xsd:string ;
+  rdfs:label "has data format (JSON, CSV, XML)" .
+
+:hasTransferProtocol a owl:DatatypeProperty ;
+  rdfs:domain :TechnicalSpecification ;
+  rdfs:range xsd:string ;
+  rdfs:label "has transfer protocol (SFTP, API, HTTPS)" .
+
+:hasAuthenticationMethod a owl:DatatypeProperty ;
+  rdfs:domain :TechnicalSpecification ;
+  rdfs:range xsd:string ;
+  rdfs:label "has authentication method (OAuth2, API Key)" .
+
+:hasRiskScore a owl:DatatypeProperty ;
+  rdfs:domain :RiskAssessment ;
+  rdfs:range xsd:float ;
+  rdfs:label "has risk score (0-1)" .
+
+:hasResidualRisk a owl:DatatypeProperty ;
+  rdfs:domain :RiskAssessment ;
+  rdfs:range xsd:float ;
+  rdfs:label "has residual risk (post-mitigation)" .
+
+:hasAuditFrequency a owl:DatatypeProperty ;
+  rdfs:domain :ComplianceMonitoring ;
+  rdfs:range xsd:string ;
+  rdfs:label "has audit frequency (monthly, quarterly)" .
+
+#################################################################
+# AUDIT & PROVENANCE CLASSES
+#################################################################
+
+:DataAccessEvent a owl:Class ;
+  rdfs:label "Data Access Event" ;
+  rdfs:comment "Single access/modification event in audit trail." .
+
+:DataTransferEvent a owl:Class ;
+  rdfs:subClassOf :DataAccessEvent ;
+  rdfs:label "Data Transfer Event" ;
+  rdfs:comment "Transfer of data between parties." .
+
+:DataProcessingActivity a owl:Class ;
+  rdfs:label "Data Processing Activity" ;
+  rdfs:comment "ROPA entry - specific processing operation." .
+
+:ComplianceAudit a owl:Class ;
+  rdfs:label "Compliance Audit" ;
+  rdfs:comment "Formal audit of data sharing compliance." .
+
+#################################################################
+# AUDIT PROPERTIES
+#################################################################
+
+:hasAccessEvent a owl:ObjectProperty ;
+  rdfs:domain :AuditTrail ;
+  rdfs:range :DataAccessEvent ;
+  rdfs:label "has access event" .
+
+:performedAt a owl:ObjectProperty ;
+  rdfs:domain :DataAccessEvent ;
+  rdfs:range time:Instant ;
+  rdfs:label "performed at" .
+
+:accessedBy a owl:ObjectProperty ;
+  rdfs:domain :DataAccessEvent ;
+  rdfs:range :AuthorisedUser ;
+  rdfs:label "accessed by" .
+
+:hasProcessingActivity a owl:ObjectProperty ;
+  rdfs:domain :DataSharingAgreement ;
+  rdfs:range :DataProcessingActivity ;
+  rdfs:label "has processing activity" .
+
+#################################################################
+# GOVERNANCE & MONITORING
+#################################################################
+
+:GovernanceBoard a owl:Class ;
+  rdfs:label "Governance Board" ;
+  rdfs:comment "Oversight committee for data sharing." .
+
+:PerformanceMetric a owl:Class ;
+  rdfs:label "Performance Metric" ;
+  rdfs:comment "KPI for data sharing effectiveness/compliance." .
+
+:IncidentReport a owl:Class ;
+  rdfs:label "Incident Report" ;
+  rdfs:comment "Data protection incident or breach report." .
+
+:ReviewMeeting a owl:Class ;
+  rdfs:label "Review Meeting" ;
+  rdfs:comment "Periodic governance review meeting." .
+
+#################################################################
+# ENUMERATIONS
+#################################################################
+
+:SecurityLevel_Low a :SecurityLevel ;
+  rdfs:label "Low" .
+
+:SecurityLevel_Medium a :SecurityLevel ;
+  rdfs:label "Medium" .
+
+:SecurityLevel_High a :SecurityLevel ;
+  rdfs:label "High" .
+
+:Frequency_Daily a :Frequency ;
+  rdfs:label "Daily" .
+
+:Frequency_Weekly a :Frequency ;
+  rdfs:label "Weekly" .
+
+:Frequency_Monthly a :Frequency ;
+  rdfs:label "Monthly" .

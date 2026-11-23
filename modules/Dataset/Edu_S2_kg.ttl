@@ -1,0 +1,44 @@
+@prefix ns1: <http://dsagen.org/> .
+@prefix ns2: <http://dsagen.org/%> .
+
+ns2:28%5B%5E ns2:5D%2B%29 "\\s*shall\\s*([a-z]+" .
+
+ns2:28subject ns1:predicate "object" .
+
+ns2:5B%5E ns2:5D%2B%29%5C%29_matches_%3D_re.findall%28pattern "text" .
+
+ns1:department_of_education ns1:acts_as "data controller for education system data." ;
+    ns1:determines "purposes and means of processing." ;
+    ns1:ensures "data sharing is lawful, necessary, and proportionate." ;
+    ns1:maintains "data processing agreements (dpas" .
+
+ns1:education_system_data ns1:is_authorised "underdata sharing and governance act 2019." ;
+    ns1:is_processed_and_shared "necessary forperformance oftask carried out inpublic interest." .
+
+ns1:educational_research_centre ns1:acts_as "data processor when processing data on behalf of doe for approved research purposes." ;
+    ns1:ensures "research outputs are anonymised and do not permit re-identification." ;
+    ns1:processes "data strictly in accordance with doe instructions, this policy, andapplicable dpa." .
+
+ns1:erc ns1:is_governed_by "ireland" ;
+    ns1:shall "cease processing data upon termination of this policy.",
+        "comply with gdpr principles, including lawfulness, fairness, and transparency, purpose limitation, data minimisation, accuracy, storage limitation, and integrity and confidentiality.",
+        "implement appropriate safeguards, including secure api transfer using tls 1.3 encryption, oauth2 authentication and role-based access controls, field-level data minimisation, comprehensive audit logging of access and processing, segregation of research environments, and regular security testing and access reviews.",
+        "maintain detailed records of data access, processing activities, and research outputs.",
+        "not attempt to identify individuals or combine datasets inway that increases re-identification risk.",
+        "promptly assist doe in responding to any data subject request.",
+        "retain data forduration ofapproved research project, plus 7 years for audit, verification, and governance purposes.",
+        "securely delete or irreversibly anonymise data atend ofretention period.",
+        "usedata solely for approved research purposes that inform education policy and standards." ;
+    ns1:shall_agree_to_comply "terms" ;
+    ns1:shall_cease_processing "data" ;
+    ns1:shall_dispose "data" ;
+    ns1:shall_notify "changes" .
+
+ns1:policy ns1:is_construed_by "laws_of_ireland" .
+
+<http://dsagen.org/rerc_shall_be_notified_of_any_changes_in_advance_where_practicable.> ns1:text%29_triples.append%28%28erc "shall_notify, notification_subject.group(" .
+
+ns1:section_9 ns1:is_referenced_by "erc" .
+
+ns1:text%29%3A_triples_%3D_%5B%5D_%23_regular_expression_to_match_triples_inform_%28subject ns1:predicate "object" .
+

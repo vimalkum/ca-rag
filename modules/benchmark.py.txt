@@ -1,0 +1,1050 @@
+"""
+RAGAS Benchmarking Module for RAG Pipeline Evaluation
+Refactored for better performance, structure, and reliability
+"""
+
+import pandas as pd
+import json
+import os
+from datetime import datetime
+from typing import List, Dict, Any, Optional, Tuple
+from pathlib import Path
+from dataclasses import dataclass
+import logging
+
+# RAGAS imports
+from ragas import evaluate
+from langchain.chat_models import ChatOpenAI
+from ragas.metrics import (
+    faithfulness,
+    answer_relevancy,
+    context_precision,
+    context_recall,
+    answer_correctness
+)
+from datasets import Dataset
+from ragas.llms import LangchainLLMWrapper
+from ragas.embeddings import LangchainEmbeddingsWrapper
+from ragas.run_config import RunConfig
+from langchain_huggingface import HuggingFacePipeline, HuggingFaceEmbeddings
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+import torch
+import streamlit as st
+from langchain_community.document_loaders.pdf import PyPDFLoader
+import plotly.graph_objects as go
+import plotly.express as px
+
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+openai.api_key = os.getenv("OPENAI_API_KEY", "")
+
+reference_doc = {
+'Description':'''Introduction: This Data Sharing Agreement (DSA) is established between Business Intelligence (BI) and Enterprise Privacy (EP). The data sharing agreement outlines the terms and conditions under which data will be shared and used between BI and EP. The purpose of this DSA is to facilitate collaboration to prevent financial fraudulent transaction while ensuring compliance with all applicable laws and internal policies regarding data handling and privacy. 
+Scope & Purpose: The DSA covers the exchange and utilization of data for agreed-upon objectives. It specifies that the data shared should be strictly for the purposes outlined in this agreement and any specific use cases that are formally approved and linked to this DSA. 
+Data Types & Usage: BI has consumers of data downstream from EP for analytics and operational use cases. Consumption avenues include BI Matching & Merging via Reltio, BI Fraudulent Transaction Record, BI Analytics. The data shall be used for purposes mutually agreed upon objectives. 
+Compliance & Privacy: Both parties agree to adhere to all relevant laws and regulations including GDPR, CCPA, and any other applicable privacy legislation. The handing of data must also be in line with Fidelity's internal data protection policies. 
+Data Security: Appropriate technical and organizational measure shall be implemented to ensure the security of the data during transmission and storage. This includes encryption, access controls, and regular security audits. 
+Data Access & Sharing Limitations: Access to shared data will be restricted to authorized personnel only. Data must not be shared beyond the scope of the agreed-upon use cases without obtaining additional consent from the respective party.
+Duration & Review of Data Sharing: This agreement will remain in effect and it will be subject to regular reviews and amendments as necessary to accommodate new use cases or changes in regulatory requirements.''',
+    'Is signed by (Data Producer) Line of Business': 'Business Intelligence (BI)', 
+'Is signed by (Data Consumer) Line of Business': 'Enterprise Privacy (EP)',
+'Data Producer approver corpID/Name': 'aXXXXXX | [First Name, Last Name] | [Designation]',
+'Data Consumer approver corpID/Name' : 'aXXXXXX | [First Name, Last Name] | [Designation]',
+'Acceptable Use':'''Any usage of data that has not already been approved and documented by an Approved Use Case (AUC) within this data sharing agreement must be submitted to BI Data Governance. 
+Legitimate Business Purpose: The data shared from Business Intelligence (BI) to Enterprise Privacy (EP)  may be used solely for legitimate business purposes related to the objectives outlined in this agreement. 
+Authorized Access: Only authorized individuals with a legitimate business purpose to access the data approved per use case may do so. Access rights should be granted in accordance with the terms of this agreement, and overseen by the data consumers line of business. 
+Data Accuracy: Users shall make all reasonable efforts to ensure the accuracy and completeness of the data and report any inaccuracies promptly to Business Intelligence (BI).
+Data Security: Users are responsible for maintaining the security of the data, including protecting it from unauthorized access, disclosure or alteration.
+Data Retention: Data shall only be retained for the duration necessary to fulfil the purposes outlined in this agreement. 
+Compliance with Laws: Enterprise privacy consumers of BI data shall comply with all applicable data protection and privacy laws and regulations when handling and processing the data view containing person dimension fields. ''',
+'Unacceptable Use':'''Any usage of data that has not already been approved and documented by an Approved Use Case (AUC) within this data sharing agreement must be submitted to BI Data Governance. 
+Unauthorized Access: Unauthorized access, viewing, or retrieval of Business Intelligence (BI) data is strictly prohibited. Consumers of BI data must not attempt to bypass security measures or access data for which they do not have explicit permission. 
+Unauthorized Disclosure: Consumer of BI data shall not disclose, share, or sell the data to any unauthorized third parties, individuals, or organizations. 
+Data for Discrimination: It is strictly prohibited to use BI data in any manner that could lead to discrimination, harassment, or harm against individuals based on their personal characteristic.
+Illegal Activities: Consumers of BI data shall not engage in any illegal activities involving the data or any activity that violates local, state or federal laws. 
+Data Tampering: Consumers of BI data shall not alter, manipulate or falsify the data in any way that compromise its integrity or accuracy. 
+Data Storage and Backup: BI data shall not be stored or backed up in unauthorized locations or devices.
+Non-Compliance with Laws: Consumers of BI data shall not use the data in any manner that violates applicable data protection and privacy laws or regulations. ''',
+'Third-Party Use Allowed':'Requires Approval',
+'Third-Party Use Restrictions':'If third party vendors are to utilize Business Intelligence (BI) data within Enterprise Compliance, third party use and restrictions will be captured here.',
+'Effective Start Date':'May 3, 2023',
+'Effective End Date':'We don’t have any details to show you',
+'Last Review Date':'May 3, 2023',
+'Next Review Date':'May 3, 2024',
+'Governs Approved Business Use Case (AUC)': 'Business Intelligence (BI) | Enterprise Privacy (EP) | Approved Use Case',
+'Requires Data Usage Policy (DUP)': 'Business Intelligence (BI) Data Usage Policy',
+'Best Communication Channels':'bi@fmr.com',
+'Governs Data Movement/Access':'Business Intelligence (BI) to Enterprise Privacy (EP) | Crimes Report | Data Movement & Access',
+'Comments':''}
+
+@dataclass
+class BenchmarkConfig:
+    """Configuration dataclass for RAG Benchmark"""
+    model_path: str = 'meta-llama/Llama-3.1-8B-Instruct'
+    embeddings_model: str = 'sentence-transformers/all-MiniLM-l6-v2'
+    device: str = 'cuda'
+    output_dir: str = './Output/'
+    reference_pdf_path: str = '/home/vkumar/PolicyFlow/modules/Dataset/Ref.pdf'
+    max_length: int = 512
+    max_new_tokens: int = 512
+    temperature: float = 0.7
+    top_p: float = 0.9
+    repetition_penalty: float = 1.15
+    # Evaluation timeout settings
+    eval_batch_size: int = 5
+    eval_max_retries: int = 3
+    eval_timeout_per_sample: int = 300  # 5 minutes per sample
+    # Performance settings
+    use_reduced_metrics: bool = False  # Set True to use fewer metrics and speed up
+
+custom_prompt = {
+    "faithfulness": """
+You are an evaluator checking if the answer is faithful to the provided context.
+Context: {context}
+Question: {question}
+Answer: {answer}
+
+Instructions:
+- Score 1.0 if fully supported by the context.
+- Score 0.5 if partially supported.
+- Score 0.0 if unsupported or hallucinated.
+Provide reasoning, then output it in JSON format.
+Score: [0 to 1]
+""",
+    "answer_relevancy": """
+You are an evaluator determining how relevant an answer is to the question.
+Question: {question}
+Answer: {answer}
+Instructions:
+- 1.0: fully relevant
+- 0.5: partially relevant
+- 0.0: irrelevant
+Reasoning then output it in JSON format.
+Score: [0 to 1]
+"""
+}
+
+class ModelLoader:
+    """Separate class for model loading operations"""
+    
+    @staticmethod
+    def load_llm(config: BenchmarkConfig) -> LangchainLLMWrapper:
+        """
+        Load and configure LLM for RAGAS evaluation
+        
+        Args:
+            config: Benchmark configuration
+            
+        Returns:
+            LangchainLLMWrapper instance
+        """
+        logger.info("Loading LLM tokenizer and model...")
+        
+        try:
+            '''
+            # Load tokenizer
+            tokenizer = AutoTokenizer.from_pretrained(
+                config.model_path,
+                padding=True,
+                truncation=True,
+                max_length=config.max_length
+            )
+            
+            # Configure padding token
+            if tokenizer.pad_token is None:
+                tokenizer.pad_token = tokenizer.eos_token
+                if tokenizer.pad_token is None:
+                    tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+            
+            # Determine dtype and device map
+            dtype = torch.float16 if config.device == 'cuda' else torch.float32
+            device_map = 'auto' if config.device == 'cuda' else None
+            
+            # Load model
+            model = AutoModelForCausalLM.from_pretrained(
+                config.model_path,
+                trust_remote_code=True,
+                torch_dtype=dtype,
+                device_map=device_map,
+                low_cpu_mem_usage=True  # Performance improvement
+            )
+            
+            # Resize token embeddings if needed
+            if len(tokenizer) != model.config.vocab_size:
+                model.resize_token_embeddings(len(tokenizer))
+            
+            # Create pipeline with config parameters
+            llm_pipeline = pipeline(
+                "text-generation",
+                model=model,
+                tokenizer=tokenizer,
+                max_new_tokens=config.max_new_tokens,
+                temperature=config.temperature,
+                top_p=config.top_p,
+                repetition_penalty=config.repetition_penalty,
+                do_sample=True
+            )
+            
+            # Wrap in LangChain and RAGAS
+            langchain_llm = HuggingFacePipeline(
+                pipeline=llm_pipeline,
+                model_kwargs={'temperature': config.temperature}
+            )
+            ragas_llm = LangchainLLMWrapper(langchain_llm, RunConfig(timeout=60))
+            '''
+            ragas_llm = LangchainLLMWrapper(ChatOpenAI(model_name="gpt-4o-mini", temperature=0.4))
+            logger.info("✓ LLM loaded successfully")
+            return ragas_llm
+            
+        except Exception as e:
+            logger.error(f"Failed to load LLM: {e}")
+            raise
+    
+    @staticmethod
+    def load_embeddings(config: BenchmarkConfig) -> LangchainEmbeddingsWrapper:
+        """
+        Load embeddings model for RAGAS
+        
+        Args:
+            config: Benchmark configuration
+            
+        Returns:
+            LangchainEmbeddingsWrapper instance
+        """
+        logger.info(f"Loading embeddings model: {config.embeddings_model}...")
+        
+        try:
+            device_id = 0 if config.device == 'cuda' and torch.cuda.is_available() else -1
+            
+            embeddings = HuggingFaceEmbeddings(
+                model_name=config.embeddings_model,
+                model_kwargs={'device': device_id},
+                encode_kwargs={'normalize_embeddings': False}
+            )
+            
+            ragas_embeddings = LangchainEmbeddingsWrapper(embeddings)
+            
+            logger.info("✓ Embeddings loaded successfully")
+            return ragas_embeddings
+            
+        except Exception as e:
+            logger.error(f"Failed to load embeddings: {e}")
+            raise
+
+
+class ReferenceLoader:
+    """Handles loading and parsing reference documents"""
+    
+    @staticmethod
+    def load_reference_text(pdf_path: str, titles: List[str]) -> Dict[str, str]:
+        """
+        Load reference text from PDF and split by titles
+        
+        Args:
+            pdf_path: Path to reference PDF
+            titles: List of section titles to extract
+            
+        Returns:
+            Dictionary mapping titles to their content
+        """
+        logger.info(f"Loading reference document from {pdf_path}")
+        
+        if not os.path.exists(pdf_path):
+            logger.warning(f"Reference PDF not found: {pdf_path}")
+            return {title.rstrip(): '' for title in titles}
+        
+        try:
+            loader = PyPDFLoader(pdf_path)
+            pages = loader.load_and_split()
+            full_text = " ".join([doc.page_content for doc in pages])
+            
+            ref_text = {}
+            remaining_text = full_text
+            
+            # Process titles in reverse order to extract sections
+            for title in reversed(titles):
+                clean_title = title.rstrip()
+                parts = remaining_text.split(clean_title, 1)
+                
+                if len(parts) > 1:
+                    ref_text[clean_title] = parts[1].strip()
+                    remaining_text = parts[0]
+                else:
+                    ref_text[clean_title] = ''
+                    logger.warning(f"Title not found in reference: {clean_title}")
+            
+            logger.info(f"✓ Loaded {len(ref_text)} reference sections")
+            return ref_text
+            
+        except Exception as e:
+            logger.error(f"Failed to load reference PDF: {e}")
+            return {title.rstrip(): '' for title in titles}
+
+
+class RAGBenchmark:
+    """
+    Comprehensive benchmarking class for RAG pipeline evaluation using RAGAS
+    """
+    
+    def __init__(
+        self,
+        titles: List[str],
+        config: Optional[BenchmarkConfig] = None
+    ):
+        """
+        Initialize the benchmark evaluator
+        
+        Args:
+            titles: List of section titles to evaluate
+            config: Optional benchmark configuration
+        """
+        self.config = config or BenchmarkConfig()
+        self.titles = titles
+        
+        # Create output directory
+        Path(self.config.output_dir).mkdir(parents=True, exist_ok=True)
+        
+        # Initialize models
+        self.llm = ModelLoader.load_llm(self.config)
+        self.evaluator_embeddings = ModelLoader.load_embeddings(self.config)
+        
+        # Initialize metrics (optionally reduced for faster evaluation)
+        if self.config.use_reduced_metrics:
+            # Use only the fastest metrics
+            self.metrics = [
+                answer_relevancy,
+                context_precision,
+            ]
+            logger.info("Using reduced metrics for faster evaluation")
+        else:
+            '''
+            scorer = Faithfulness(llm = self.llm)
+            #scorer.get_prompts()
+            prompt = scorer.get_prompts()["n_l_i_statement_prompt"]
+            prompt.instruction = custom_prompt['faithfulness']
+            scorer.set_prompts(**{"n_l_i_statement_prompt": prompt})
+            
+            self.metrics = [scorer]'''
+            # Collect metrics
+            '''
+            self.metrics = [
+                faithfulness
+            ]
+            '''
+            self.metrics = [
+                faithfulness,
+                answer_relevancy,
+                context_precision,
+                context_recall,
+                answer_correctness
+            ]
+        
+        # Load reference text
+        '''
+        self.ref_text = ReferenceLoader.load_reference_text(
+            self.config.reference_pdf_path,
+            titles
+        )'''
+        self.ref_text = reference_doc
+        
+        logger.info("✓ RAGBenchmark initialized successfully")
+    
+    def _extract_session_data(self, title: str) -> Optional[Tuple[str, str, List, str]]:
+        """
+        Safely extract data from Streamlit session state
+        
+        Args:
+            title: Section title
+            
+        Returns:
+            Tuple of (prompt, answer, contexts, ground_truth) or None if missing
+        """
+        try:
+            clean_title = title.rstrip()
+            print(st.session_state.generated_output)
+            # Check if title exists in session state
+            if clean_title not in st.session_state.generated_output:
+                logger.warning(f"Title not in generated_output: {clean_title}")
+                return None
+            
+            # Extract data with safety checks
+            prompt = st.session_state.prmpt.get(clean_title)
+            answer = st.session_state.generated_output.get(clean_title)
+            docs = st.session_state.rdocs.get(clean_title, [])
+            ground_truth = self.ref_text.get(clean_title, '')
+            
+            # Validate required fields
+            if not prompt or not answer:
+                logger.warning(f"Missing prompt or answer for: {clean_title}")
+                return None
+            
+            # Extract contexts from documents
+            contexts = [doc.page_content for doc in docs if hasattr(doc, 'page_content')]
+            
+            if not contexts:
+                logger.warning(f"No valid contexts for: {clean_title}")
+                return None
+            
+            return prompt, answer, contexts, ground_truth
+            
+        except (KeyError, AttributeError) as e:
+            logger.warning(f"Error extracting data for '{title}': {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error for '{title}': {e}")
+            return None
+    
+    def create_test_dataset(self) -> Dataset:
+        """
+        Convert test cases to RAGAS-compatible dataset from session state
+        
+        Returns:
+            Dataset object for RAGAS evaluation
+        """
+        logger.info("Creating test dataset...")
+        
+        data = {
+            'question': [],
+            'answer': [],
+            'contexts': [],
+            'ground_truth': []
+        }
+        
+        processed_count = 0
+        skipped_count = 0
+        
+        for title in self.titles:
+            result = self._extract_session_data(title)
+            
+            if result is None:
+                skipped_count += 1
+                continue
+            
+            prompt, answer, contexts, ground_truth = result
+            
+            data['question'].append(prompt)
+            data['answer'].append(answer)
+            data['contexts'].append(contexts)
+            data['ground_truth'].append(ground_truth)
+            
+            processed_count += 1
+        
+        logger.info(f"✓ Dataset created: {processed_count} samples processed, {skipped_count} skipped")
+        
+        if processed_count == 0:
+            raise ValueError("No valid test cases found in session state")
+        
+        return Dataset.from_dict(data)
+    
+    def evaluate_pipeline_simple(self) -> Dict[str, Any]:
+        """
+        Simplified evaluation without batching (use for small datasets < 10 samples)
+        
+        Returns:
+            Dictionary containing all evaluation metrics and detailed results
+        """
+        logger.info("Starting simple pipeline evaluation (no batching)...")
+        
+        try:
+            dataset = self.create_test_dataset()
+            '''
+            results = evaluate(
+                dataset,
+                llm=self.llm,
+                metrics=self.metrics,
+                embeddings=self.evaluator_embeddings,
+                run_config=RunConfig(max_workers=1),
+                raise_exceptions=False  # Don't fail on individual errors
+            )
+            '''
+            results = evaluate(
+                dataset,
+                metrics=self.metrics,
+                llm=self.llm
+            )
+            
+            results_df = results.to_pandas()
+            
+            metric_columns = [
+                'faithfulness', 
+                'answer_relevancy', 
+                'context_precision', 
+                'context_recall', 
+                'answer_correctness'
+            ]
+            
+            aggregate_metrics = {
+                metric: float(results_df[metric].mean()) 
+                for metric in metric_columns 
+                if metric in results_df.columns
+            }
+            
+            if aggregate_metrics:
+                aggregate_metrics['overall_score'] = sum(aggregate_metrics.values()) / len(aggregate_metrics)
+            else:
+                aggregate_metrics['overall_score'] = 0.0
+            
+            logger.info(f"✓ Evaluation complete. Overall score: {aggregate_metrics['overall_score']:.4f}")
+            
+            return {
+                'aggregate_metrics': aggregate_metrics,
+                'detailed_results': results_df,
+                'timestamp': datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Evaluation failed: {e}")
+            raise
+    
+    def evaluate_pipeline(
+        self, 
+        batch_size: Optional[int] = None,
+        max_retries: Optional[int] = None,
+        timeout_per_sample: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Run complete evaluation on test cases with timeout handling and batching
+        
+        Args:
+            batch_size: Number of samples to process at once (default from config)
+            max_retries: Maximum retry attempts for failed batches (default from config)
+            timeout_per_sample: Timeout in seconds per sample (default from config)
+            
+        Returns:
+            Dictionary containing all evaluation metrics and detailed results
+        """
+        # Use config defaults if not provided
+        batch_size = batch_size or self.config.eval_batch_size
+        max_retries = max_retries or self.config.eval_max_retries
+        timeout_per_sample = timeout_per_sample or self.config.eval_timeout_per_sample
+        
+        logger.info("Starting pipeline evaluation...")
+        logger.info(f"Config: batch_size={batch_size}, max_retries={max_retries}, timeout={timeout_per_sample}s")
+        
+        try:
+            # Create dataset
+            dataset = self.create_test_dataset()
+            total_samples = len(dataset)
+            logger.info(f"Total samples to evaluate: {total_samples}")
+            
+            # Process in batches to avoid timeout
+            all_results = []
+            
+            for i in range(0, total_samples, batch_size):
+                batch_end = min(i + batch_size, total_samples)
+                batch_dataset = dataset.select(range(i, batch_end))
+                batch_num = (i // batch_size) + 1
+                total_batches = (total_samples + batch_size - 1) // batch_size
+                
+                logger.info(f"Processing batch {batch_num}/{total_batches} (samples {i+1}-{batch_end})")
+                
+                # Retry logic for each batch
+                for attempt in range(max_retries):
+                    try:
+                        # Run RAGAS evaluation on batch
+                        # Note: Using concurrent.futures for better timeout control
+                        from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+                        
+                        def run_evaluation():
+                            '''
+                            return evaluate(
+                                batch_dataset,
+                                llm=self.llm,
+                                metrics=self.metrics,
+                                embeddings=self.evaluator_embeddings,
+                                raise_exceptions=False, run_config=RunConfig(max_workers=1)
+                            )
+                            '''
+                            return evaluate(
+                                batch_dataset,
+                                metrics=self.metrics,
+                                llm = self.llm
+                            )
+                        
+                        # Run with timeout using ThreadPoolExecutor
+                        with ThreadPoolExecutor(max_workers=1) as executor:
+                            future = executor.submit(run_evaluation)
+                            try:
+                                batch_results = future.result(timeout=timeout_per_sample * len(batch_dataset))
+                                all_results.append(batch_results.to_pandas())
+                                logger.info(f"✓ Batch {batch_num} completed successfully")
+                                break
+                            except FuturesTimeoutError:
+                                logger.warning(f"Batch {batch_num} timeout after {timeout_per_sample * len(batch_dataset)}s")
+                                raise TimeoutError(f"Evaluation timeout for batch {batch_num}")
+                        
+                    except (TimeoutError, Exception) as e:
+                        
+                        if attempt < max_retries - 1:
+                            logger.warning(f"Batch {batch_num} failed (attempt {attempt+1}/{max_retries}): {e}")
+                            logger.info("Retrying with smaller batch size...")
+                            
+                            # Try with even smaller batch
+                            if len(batch_dataset) > 1:
+                                smaller_batch_size = max(1, len(batch_dataset) // 2)
+                                for j in range(0, len(batch_dataset), smaller_batch_size):
+                                    small_batch_end = min(j + smaller_batch_size, len(batch_dataset))
+                                    small_batch = batch_dataset.select(range(j, small_batch_end))
+                                    
+                                    try:
+                                        small_results = evaluate(
+                                            small_batch,
+                                            metrics=self.metrics,
+                                            llm=self.llm
+                                        )
+                                        all_results.append(small_results.to_pandas())
+                                        logger.info(f"✓ Sub-batch {j//smaller_batch_size + 1} completed")
+                                    except Exception as sub_e:
+                                        logger.error(f"Sub-batch failed: {sub_e}")
+                                        continue
+                                break
+                        else:
+                            logger.error(f"Batch {batch_num} failed after {max_retries} attempts: {e}")
+                            # Continue with next batch instead of failing completely
+                            continue
+            
+            if not all_results:
+                raise ValueError("All evaluation batches failed. Please check your configuration and data.")
+            
+            # Combine all batch results
+            results_df = pd.concat(all_results, ignore_index=True)
+            
+            # Calculate aggregate metrics
+            metric_columns = [
+                'faithfulness', 
+                'answer_relevancy', 
+                'context_precision', 
+                'context_recall', 
+                'answer_correctness'
+            ]
+            
+            aggregate_metrics = {
+                metric: float(results_df[metric].mean()) 
+                for metric in metric_columns 
+                if metric in results_df.columns
+            }
+            
+            # Calculate overall score
+            if aggregate_metrics:
+                aggregate_metrics['overall_score'] = sum(aggregate_metrics.values()) / len(aggregate_metrics)
+            else:
+                aggregate_metrics['overall_score'] = 0.0
+            
+            logger.info(f"✓ Evaluation complete. Overall score: {aggregate_metrics['overall_score']:.4f}")
+            logger.info(f"Successfully evaluated {len(results_df)}/{total_samples} samples")
+            
+            return {
+                'aggregate_metrics': aggregate_metrics,
+                'detailed_results': results_df,
+                'timestamp': datetime.now().isoformat(),
+                'samples_evaluated': len(results_df),
+                'total_samples': total_samples
+            }
+            
+        except Exception as e:
+            logger.error(f"Evaluation failed: {e}")
+            raise
+    
+    def save_results(
+        self, 
+        results: Dict[str, Any], 
+        filename: Optional[str] = None
+    ) -> Tuple[str, str]:
+        """
+        Save evaluation results to files
+        
+        Args:
+            results: Evaluation results dictionary
+            filename: Optional custom filename
+            
+        Returns:
+            Tuple of (metrics_path, csv_path)
+        """
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"ragas_evaluation_{timestamp}"
+        
+        try:
+            # Save aggregate metrics as JSON
+            metrics_path = os.path.join(self.config.output_dir, f"{filename}_metrics.json")
+            with open(metrics_path, 'w') as f:
+                json.dump(results['aggregate_metrics'], f, indent=2)
+            
+            # Save detailed results as CSV
+            csv_path = os.path.join(self.config.output_dir, f"{filename}_detailed.csv")
+            results['detailed_results'].to_csv(csv_path, index=False)
+            
+            logger.info(f"✓ Results saved to:\n  - {metrics_path}\n  - {csv_path}")
+            
+            return metrics_path, csv_path
+            
+        except Exception as e:
+            logger.error(f"Failed to save results: {e}")
+            raise
+    
+    def generate_report(self, results: Dict[str, Any]) -> str:
+        """
+        Generate a formatted text report of evaluation results
+        
+        Args:
+            results: Evaluation results dictionary
+            
+        Returns:
+            Formatted report string
+        """
+        metrics = results['aggregate_metrics']
+        num_cases = len(results['detailed_results'])
+        
+        report = f"""
+{'='*60}
+RAG PIPELINE EVALUATION REPORT
+{'='*60}
+Timestamp: {results['timestamp']}
+Total Test Cases: {num_cases}
+
+AGGREGATE METRICS (0.0 - 1.0 scale):
+{'-'*60}
+Faithfulness:           {metrics.get('faithfulness', 0):.4f}
+  → Answer supported by retrieved context
+
+Answer Relevancy:       {metrics.get('answer_relevancy', 0):.4f}
+  → Answer addresses the question properly
+
+Context Precision:      {metrics.get('context_precision', 0):.4f}
+  → Retrieved documents are relevant
+
+Context Recall:         {metrics.get('context_recall', 0):.4f}
+  → Key information was retrieved
+
+Answer Correctness:     {metrics.get('answer_correctness', 0):.4f}
+  → Answer aligns with ground truth
+
+{'-'*60}
+OVERALL SCORE:          {metrics['overall_score']:.4f}
+{'='*60}
+
+PERFORMANCE ANALYSIS:
+{'-'*60}
+"""
+        # Performance categorization
+        score = metrics['overall_score']
+        if score >= 0.8:
+            report += "✓ EXCELLENT - Pipeline performs very well\n"
+        elif score >= 0.6:
+            report += "○ GOOD - Pipeline performs adequately\n"
+        elif score >= 0.4:
+            report += "△ MODERATE - Pipeline needs improvement\n"
+        else:
+            report += "✗ POOR - Pipeline requires significant optimization\n"
+        
+        # Identify weakest metric
+        metric_items = [(k, v) for k, v in metrics.items() if k != 'overall_score']
+        if metric_items:
+            weakest = min(metric_items, key=lambda x: x[1])
+            report += f"\nWeakest Metric: {weakest[0]} ({weakest[1]:.4f})\n"
+            report += "→ Focus optimization efforts here\n"
+        
+        report += f"\n{'='*60}\n"
+        
+        return report
+
+    def generate_report_streamlit(self, results: Dict[str, Any]) -> None:
+        """
+        Generate and display evaluation results in Streamlit with interactive visualizations
+
+        Args:
+            results: Evaluation results dictionary
+        """
+        metrics = results['aggregate_metrics']
+        num_cases = len(results['detailed_results'])
+
+        # Header
+        st.title("🎯 RAG Pipeline Evaluation Report")
+        st.caption(f"Generated: {results['timestamp']}")
+
+        # Summary Metrics in columns
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric(
+                label="📊 Total Test Cases",
+                value=num_cases
+            )
+
+        with col2:
+            st.metric(
+                label="⭐ Overall Score",
+                value=f"{metrics['overall_score']:.3f}",
+                delta=f"{(metrics['overall_score'] - 0.7):.3f}" if metrics['overall_score'] != 0.7 else None
+            )
+
+        with col3:
+            # Performance badge
+            score = metrics['overall_score']
+            if score >= 0.8:
+                st.success("✓ EXCELLENT")
+            elif score >= 0.6:
+                st.info("○ GOOD")
+            elif score >= 0.4:
+                st.warning("△ MODERATE")
+            else:
+                st.error("✗ POOR")
+
+        st.divider()
+
+        # Detailed Metrics Section
+        st.header("📈 Detailed Metrics")
+
+        # Create metrics dataframe for display
+        metric_data = []
+        metric_descriptions = {
+            'faithfulness': 'Answer supported by retrieved context',
+            'answerrelevancy': 'Answer addresses the question properly',
+            'answer_relevancy': 'Answer addresses the question properly',
+            'contextualprecision': 'Retrieved documents are relevant',
+            'context_precision': 'Retrieved documents are relevant',
+            'contextualrecall': 'Key information was retrieved',
+            'context_recall': 'Key information was retrieved',
+            'contextualrelevancy': 'Context is relevant to the query',
+            'answer_correctness': 'Answer aligns with ground truth'
+        }
+
+        for key, value in metrics.items():
+            if key not in ['overall_score', 'total_tests', 'passed_tests', 'pass_rate']:
+                metric_data.append({
+                    'Metric': key.replace('_', ' ').title(),
+                    'Score': value,
+                    'Description': metric_descriptions.get(key, 'N/A')
+                })
+
+        # Display metrics in a table
+        if metric_data:
+            df_metrics = pd.DataFrame(metric_data)
+
+            # Create gauge charts for each metric
+            cols = st.columns(len(metric_data))
+            for idx, (col, metric_info) in enumerate(zip(cols, metric_data)):
+                with col:
+                    fig = go.Figure(go.Indicator(
+                        mode="gauge+number+delta",
+                        value=metric_info['Score'],
+                        domain={'x': [0, 1], 'y': [0, 1]},
+                        title={'text': metric_info['Metric'], 'font': {'size': 14}},
+                        delta={'reference': 0.7, 'increasing': {'color': "green"}},
+                        gauge={
+                            'axis': {'range': [None, 1], 'tickwidth': 1, 'tickcolor': "darkblue"},
+                            'bar': {'color': "darkblue"},
+                            'bgcolor': "white",
+                            'borderwidth': 2,
+                            'bordercolor': "gray",
+                            'steps': [
+                                {'range': [0, 0.4], 'color': '#ffcccc'},
+                                {'range': [0.4, 0.6], 'color': '#ffffcc'},
+                                {'range': [0.6, 0.8], 'color': '#ccffcc'},
+                                {'range': [0.8, 1], 'color': '#ccffff'}
+                            ],
+                            'threshold': {
+                                'line': {'color': "red", 'width': 4},
+                                'thickness': 0.75,
+                                'value': 0.7
+                            }
+                        }
+                    ))
+                    fig.update_layout(height=250, margin=dict(l=10, r=10, t=50, b=10))
+                    st.plotly_chart(fig, use_container_width=True)
+                    st.caption(metric_info['Description'])
+
+        st.divider()
+
+        # Radar Chart for Overall Performance
+        st.header("🎯 Performance Overview")
+
+        if metric_data:
+            fig_radar = go.Figure()
+
+            fig_radar.add_trace(go.Scatterpolar(
+                r=[m['Score'] for m in metric_data],
+                theta=[m['Metric'] for m in metric_data],
+                fill='toself',
+                name='Current Performance',
+                line_color='blue'
+            ))
+
+            # Add target line at 0.7
+            fig_radar.add_trace(go.Scatterpolar(
+                r=[0.7] * len(metric_data),
+                theta=[m['Metric'] for m in metric_data],
+                fill='toself',
+                name='Target (0.7)',
+                line_color='red',
+                line_dash='dash',
+                opacity=0.3
+            ))
+
+            fig_radar.update_layout(
+                polar=dict(
+                    radialaxis=dict(
+                        visible=True,
+                        range=[0, 1]
+                    )
+                ),
+                showlegend=True,
+                height=500
+            )
+
+            st.plotly_chart(fig_radar, use_container_width=True)
+
+        st.divider()
+
+        # Performance Analysis
+        st.header("💡 Performance Analysis")
+
+        score = metrics['overall_score']
+
+        if score >= 0.8:
+            st.success("✓ **EXCELLENT** - Pipeline performs very well")
+            st.balloons()
+        elif score >= 0.6:
+            st.info("○ **GOOD** - Pipeline performs adequately")
+        elif score >= 0.4:
+            st.warning("△ **MODERATE** - Pipeline needs improvement")
+        else:
+            st.error("✗ **POOR** - Pipeline requires significant optimization")
+
+        # Identify and highlight weakest metric
+        metric_items = [(k, v) for k, v in metrics.items() 
+                       if k not in ['overall_score', 'total_tests', 'passed_tests', 'pass_rate']]
+
+        if metric_items:
+            weakest = min(metric_items, key=lambda x: x[1])
+            strongest = max(metric_items, key=lambda x: x[1])
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.error(f"**Weakest Metric:** {weakest[0].replace('_', ' ').title()}")
+                st.write(f"Score: {weakest[1]:.4f}")
+                st.write("→ Focus optimization efforts here")
+
+            with col2:
+                st.success(f"**Strongest Metric:** {strongest[0].replace('_', ' ').title()}")
+                st.write(f"Score: {strongest[1]:.4f}")
+                st.write("→ Maintain this performance")
+
+        st.divider()
+
+        # Detailed Results Table
+        st.header("📋 Detailed Results")
+
+        with st.expander("View Individual Test Case Results", expanded=False):
+            # Display detailed results dataframe
+            display_df = results['detailed_results'].copy()
+
+            # Format numeric columns
+            numeric_cols = display_df.select_dtypes(include=['float64', 'float32']).columns
+            for col in numeric_cols:
+                display_df[col] = display_df[col].apply(lambda x: f"{x:.4f}" if pd.notna(x) else "N/A")
+
+            st.dataframe(
+                display_df,
+                use_container_width=True,
+                height=400
+            )
+
+            # Download button for detailed results
+            csv = results['detailed_results'].to_csv(index=False)
+            st.download_button(
+                label="📥 Download Detailed Results (CSV)",
+                data=csv,
+                file_name=f"evaluation_results_{results['timestamp']}.csv",
+                mime="text/csv"
+            )
+
+        # Pass/Fail Summary (if available)
+        if 'passed_tests' in metrics and 'total_tests' in metrics:
+            st.divider()
+            st.header("✅ Test Summary")
+
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.metric("Total Tests", metrics['total_tests'])
+
+            with col2:
+                st.metric("Passed Tests", metrics['passed_tests'])
+
+            with col3:
+                pass_rate = metrics.get('pass_rate', 0)
+                st.metric("Pass Rate", f"{pass_rate:.1%}")
+
+            # Progress bar for pass rate
+            st.progress(pass_rate)
+
+
+    def compare_evaluations(
+        self, 
+        results1: Dict[str, Any], 
+        results2: Dict[str, Any]
+    ) -> str:
+        """
+        Compare two evaluation runs to track improvements
+        
+        Args:
+            results1: First evaluation results (baseline)
+            results2: Second evaluation results (current)
+            
+        Returns:
+            Comparison report string
+        """
+        m1 = results1['aggregate_metrics']
+        m2 = results2['aggregate_metrics']
+        
+        report = f"""
+{'='*60}
+EVALUATION COMPARISON
+{'='*60}
+Baseline:  {results1['timestamp']}
+Current:   {results2['timestamp']}
+
+METRIC CHANGES:
+{'-'*60}
+"""
+        for metric in m1.keys():
+            if metric == 'overall_score':
+                continue
+            
+            if metric not in m2:
+                continue
+                
+            change = m2[metric] - m1[metric]
+            pct_change = (change / m1[metric] * 100) if m1[metric] > 0 else 0
+            symbol = "↑" if change > 0 else "↓" if change < 0 else "→"
+            report += f"{metric:25s} {symbol} {change:+.4f} ({pct_change:+.2f}%)\n"
+        
+        overall_change = m2['overall_score'] - m1['overall_score']
+        report += f"{'-'*60}\n"
+        report += f"Overall Score Change:     {overall_change:+.4f}\n"
+        report += f"{'='*60}\n"
+        
+        return report
+
+if __name__ == "__main__":
+    # Configuration
+    config = BenchmarkConfig(
+        device='cuda' if torch.cuda.is_available() else 'cpu'
+    )
+    
+    # Initialize benchmark
+    titles = st.session_state.titles  # Replace with your titles
+    benchmark = RAGBenchmark(titles, config)
+    
+    # Run evaluation
+    results = benchmark.evaluate_pipeline()
+    
+    # Save and display results
+    benchmark.save_results(results)
+    print(benchmark.generate_report(results))

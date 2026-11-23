@@ -1,0 +1,54 @@
+@prefix ns1: <http://dsagen.org/> .
+
+ns1:both_parties ns1:shall_maintain "confidentiality" .
+
+ns1:data_protection_regulation_%28gdpr%29 ns1:grounds "processing and sharing of data" .
+
+ns1:data_sharing_and_governance_act_2019 ns1:grounds "processing and sharing of data" .
+
+ns1:data_subjects ns1:are_entitled_to "right of access",
+        "right to erasure",
+        "right to rectification",
+        "right to restriction of processing" .
+
+ns1:department_of_foreign_affairs ns1:acts_as "primary data controller" ;
+    ns1:agreement "comply" .
+
+ns1:dfa ns1:determines "purposes and means of processing personal data" ;
+    ns1:may_process_and_share "parental undertakings",
+        "surrogacy arrangements" ;
+    ns1:processes "personal data" ;
+    ns1:shall_conduct "data protection impact assessments" ;
+    ns1:shall_dispose "data" ;
+    ns1:shall_notify "data breach" ;
+    ns1:shall_retain "personal data" ;
+    ns1:shall_update "policy" ;
+    ns1:shares "personal data" .
+
+ns1:dfa_and_hse ns1:shall_conduct "audits and reviews" ;
+    ns1:shall_implement "appropriate technical and organisational measures" ;
+    ns1:shall_maintain "written data processing agreement" ;
+    ns1:shall_monitor "compliance" .
+
+ns1:health_service_executive ns1:acts_as "data recipient" ;
+    ns1:agreement "comply" .
+
+ns1:hse ns1:facilitates "healthcare services" ;
+    ns1:processes "personal data" ;
+    ns1:receives "personal data" ;
+    ns1:shall_use "shared data" .
+
+ns1:mediation_or_arbitration ns1:procedure "irish law" .
+
+ns1:policy ns1:agreement "comply" ;
+    ns1:effective_date "[insert date]" ;
+    ns1:review_period "periodically" ;
+    ns1:shall_be_governed_by "laws ofrepublic of ireland" ;
+    ns1:shall_be_reviewed_periodically%29_%28data_subjects "are entitled to, exercise their rights" .
+
+ns1:rconfirm_their_agreement_to_comply_with_this_policy ns1:text%29_if_match%3A_triples.append%28%28policy "agreement, comply" .
+
+ns1:rshall_be_reviewed_periodically ns1:text%29_if_match%3A_triples.append%28%28policy "review period, periodically" .
+
+ns1:text%29%3A_triples_%3D_%5B%5D_%23_extract_policy_name_and_effective_date_match_%3D_re.search%28rpolicy_is_effective_from_%5C%5B%28.%2A%3F%29%5C%5D ns1:text%29_if_match%3A_effective_date_%3D_match.group%281%29_triples.append%28%28policy "effective date, effective_date" .
+

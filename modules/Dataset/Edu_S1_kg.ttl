@@ -1,0 +1,44 @@
+@prefix ns1: <http://dsagen.org/> .
+
+ns1:data_protection_act_2018 ns1:is_complied_with "the collection, processing, and sharing of personal data" .
+
+ns1:data_protection_commission ns1:shall_be_informed "affected data subjects where there ishigh risk to their rights" ;
+    ns1:shall_be_notified "where required under gdpr article 33" .
+
+ns1:data_protection_officer ns1:shall_be_notified "inevent ofbreach" .
+
+ns1:data_subjects ns1:haveright_to "access their personal data",
+        "lodgecomplaint withdata protection commission",
+        "request erasure where lawful",
+        "request rectification of inaccurate data",
+        "restrict or object to processing" .
+
+ns1:dcediy ns1:acts_as "data controller" ;
+    ns1:determinespurposes_and_means_of_processing_personal_data "registered early learning and care settings" ;
+    ns1:implements "appropriate security controls" ;
+    ns1:maintains "formal data processing agreements" ;
+    ns1:processes_and_shares_data_onlegal_basis_of "article 6(1" .
+
+ns1:dcediy_data_protection_officer ns1:shall_be_notified "inevent ofbreach" ;
+    ns1:shall_be_notified_without_delay "the de data protection officer" .
+
+ns1:de_early_years_education_inspectorate ns1:processes_data_strictly_on_behalf_of "dcediy" ;
+    ns1:shall_refrain_from_onward_disclosure_unless "legally authorised" ;
+    ns1:shall_restrict_access_to "authorised inspectorate personnel" ;
+    ns1:shall_useshared_data_only_for "enabling inspections of educational quality" .
+
+ns1:department_of_education_early_years_education_inspectorate ns1:accepts "terms ofpolicy" ;
+    ns1:agrees "comply withpolicy" ;
+    ns1:confirms "read and understoodpolicy" ;
+    ns1:processes "data underpolicy" .
+
+ns1:disputes ns1:shall_be_addressed_through "mediation in accordance with agreed public-sector dispute resolution procedures" .
+
+ns1:e%29_gdpr%29_-_%28de_early_years_education_inspectorate ns1:acts_as "data recipient" .
+
+ns1:general_data_protection_regulation_%28eu%29_2016%2F679 ns1:is_complied_with "the collection, processing, and sharing of personal data" .
+
+ns1:laws_of_ireland ns1:govern "this policy" .
+
+ns1:terms_ofpolicy ns1:shall_be_complied_with "department of education early years education inspectorate" .
+

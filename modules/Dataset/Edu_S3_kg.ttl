@@ -1,0 +1,45 @@
+@prefix ns1: <http://dsagen.org/> .
+
+ns1:data_sharing_and_governance_act_2019 ns1:provides_statutory_authority_for "processing and sharing of examination system data" .
+
+ns1:educational_research_centre ns1:access "examination system data" ;
+    ns1:comply_with "terms of this agreement" ;
+    ns1:process "examination system data" ;
+    ns1:processes "examination system data" .
+
+ns1:educational_research_centre_%28erc%29 ns1:acts_as "data processor" ;
+    ns1:ensures "no research outputs permit identification of individual candidates" ;
+    ns1:processes_data "on documented instructions fromsec" .
+
+ns1:erc ns1:cease_processing "data" ;
+    ns1:dispose_of "data" ;
+    ns1:notify "in writing" .
+
+ns1:gdpr_article_6%281%29%28e%29 ns1:provides_legal_basis_for "processing and sharing of examination system data" .
+
+ns1:laws_of_ireland ns1:govern "this agreement" .
+
+ns1:section_9 ns1:dispose_of_data "in accordance with" .
+
+ns1:state_examinations_commission_%28sec%29 ns1:acts_as "data controller" ;
+    ns1:determines "purposes and means of processing" ;
+    ns1:ensures "lawful, necessary, and proportionate data sharing" ;
+    ns1:maintains "governance oversight" ;
+    ns1:shares_data "onbasis of gdpr article 6(1" .
+
+ns1:the_erc ns1:shall "ensure that all research outputs are anonymised and disclosure-controlled",
+        "not attempt to re-identify individuals or link datasets inmanner that increases re-identification risk",
+        "not disclose or sharedata with third parties without prior written approval fromsec",
+        "useshared data solely forpurposes of study administration, test development, and independent research as defined in this agreement" .
+
+ns1:the_gdpr ns1:complies_with "accuracy",
+        "data minimisation",
+        "integrity and confidentiality",
+        "lawfulness, fairness, and transparency",
+        "purpose limitation",
+        "storage limitation" .
+
+ns1:the_sec_and_erc ns1:shall_implement "field-level data minimisation",
+        "oauth2 authentication and role-based access controls",
+        "secure api transfer using tls 1.3 encryption" .
+

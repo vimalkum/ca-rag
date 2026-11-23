@@ -254,9 +254,11 @@ def export_training_data():
 
 def flush():
         gc.collect()
-        torch.cuda.empty_cache()
-        torch.cuda.reset_peak_memory_stats()
-
+        try:
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats()
+        except Exception:
+            pass
 if __name__ == "__main__":
     for key in ["rag", "llm_model"]:
         if key in st.session_state:

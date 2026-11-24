@@ -64,7 +64,7 @@ def _build_groq_llm(model_name: str):
             "Add `langchain-groq` to requirements.txt and redeploy."
         ) from e
 
-    groq_model = _GROQ_MODEL_MAP.get(model_name, "llama-3.1-8b-instant")
+    groq_model = _GROQ_MODEL_MAP.get(model_name, "llama-3.3-70b-versatile")
     if _MODEL_OVERRIDE:
         # Allow explicit override e.g. LLM_MODEL_OVERRIDE=gemma2-9b-it
         groq_model = _MODEL_OVERRIDE

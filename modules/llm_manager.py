@@ -34,9 +34,7 @@ _MODEL_OVERRIDE = os.getenv("LLM_MODEL_OVERRIDE", "")
 
 # Map original large model names → small Groq equivalents
 _GROQ_MODEL_MAP = {
-    "meta-llama/Llama-3.1-8B-Instruct":          "llama-3.1-8b-instant",
-    "meta-llama/Llama-3.2-3B-Instruct":          "llama-3.2-3b-preview",
-    "mistralai/Mistral-7B-Instruct-v0.3":        "mixtral-8x7b-32768",
+    'Llama-3.3-70B': "llama-3.3-70b-versatile"
 }
 
 # Small CPU-friendly HuggingFace models (used when no Groq key is available)

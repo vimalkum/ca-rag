@@ -2,58 +2,58 @@
 # Streamlit Community Cloud compatible
 
 # Core
-streamlit>=1.35.0
+streamlit
 
-# LangChain — split packages (v0.2+ layout)
-langchain>=0.2.0,<1.0.0
-langchain-core>=0.2.0
-langchain-community>=0.2.0
-langchain-huggingface>=0.0.3
-langchain-text-splitters>=0.2.0
-langchain-groq>=0.1.6
+# LangChain
+langchain
+langchain-core
+langchain-community
+langchain-huggingface
+langchain-text-splitters
+langchain-groq
 
 # Groq API
-groq>=0.9.0
+groq
 
 # Transformers / embeddings
-transformers>=4.40.0
-accelerate>=0.30.0
-sentencepiece>=0.2.0
-tokenizers>=0.19.0
-sentence-transformers>=2.7.0
+transformers
+accelerate
+sentencepiece
+tokenizers
+sentence-transformers
 
 # Vector store
-faiss-cpu>=1.8.0
+faiss-cpu
 
 # PDF
-pypdf>=4.0.0
-reportlab>=4.0.0
-PyPDF2>=3.0.0
+pypdf
+reportlab
+PyPDF2
 
 # Evaluation
-rouge-score>=0.1.2
-scikit-learn>=1.4.0
-numpy>=1.26.0
+rouge-score
+scikit-learn
+numpy
 python-Levenshtein
 
 # RLHF
-trl>=0.8.0
-datasets>=2.19.0
-wandb>=0.17.0
+trl
+datasets
+wandb
 
 # NLP
-nltk>=3.8.1
-rapidfuzz>=3.9.0
+nltk
+rapidfuzz
 
 # Torch (CPU wheel)
-torch>=2.2.0
-torchvision>=0.17.0
+torch
+torchvision
 
 # Knowledge graph / ontology
-rdflib>=7.0.0
+rdflib
 
 # Misc
-pandas>=2.2.0
-plotly>=5.22.0
-openai>=1.0.0
-deepeval>=0.21.0
+pandas
+plotly
+openai
+deepeval

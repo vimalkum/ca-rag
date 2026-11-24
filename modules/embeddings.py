@@ -3,7 +3,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 
 class EmbeddingDB:
-    def __init__(self, model_path, device='cuda'):
+    def __init__(self, model_path, device='cpu'):
         self.model_path = model_path
         self.device = device
         self.embeddings = None

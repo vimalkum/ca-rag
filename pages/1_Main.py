@@ -33,10 +33,14 @@ except Exception:
     def similarity(a: str, b: str) -> float:
         return SequenceMatcher(None, a, b).ratio()
     _SIM_BACKEND = "difflib.SequenceMatcher"
+'''
 models = {
     'Llama-3.1-8B': "llama-3.1-8b-instant",
     'Llama-3.2-3B': "llama-3.2-3b-preview",
     'Mistral-7B': "mixtral-8x7b-32768"
+}'''
+models = {
+    'Llama-3.3-70B': "llama-3.3-70b-versatile"
 }
 #model_path = "meta-llama/Llama-3.1-8B-Instruct"
 #model_path = "mistralai/Mistral-7B-Instruct-v0.3"

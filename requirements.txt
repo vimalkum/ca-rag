@@ -7,7 +7,7 @@ streamlit
 # LangChain
 langchain
 langchain-core
-langchain-classic
+langchain_classic
 langchain-community
 langchain-huggingface
 langchain-text-splitters

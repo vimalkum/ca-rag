@@ -421,7 +421,7 @@ class CA_RAG_App:
                 desc = loader.extract_desc("./modules/Dataset/descriptions.txt")
                 docs = loader.load_documents()
 
-                embedder = EmbeddingDB(self.embedding_path, device="cuda")
+                embedder = EmbeddingDB(self.embedding_path, device="cpu")
                 embeddings, db = embedder.load(docs)
                 retriever = db.as_retriever()
                 if 'rl_model' in st.session_state:

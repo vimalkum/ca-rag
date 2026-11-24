@@ -13,7 +13,7 @@ from modules.generator import DSAGenerator
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_classic.chains.combine_documents.stuff import create_stuff_documents_chain
-from langchain.chains.retrieval import create_retrieval_chain
+from langchain_classic.chains.retrieval import create_retrieval_chain
 
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer

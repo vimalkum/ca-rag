@@ -18,7 +18,6 @@ CONTEXT:
 
 If the context does not contain enough information, set answered=false and keep evidence empty.
 """
-openai.api_key = os.getenv("OPENAI_API_KEY", "")
 
 def _try_openai():
     try:

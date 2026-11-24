@@ -1,6 +1,6 @@
 # CA-RAG — requirements.txt
 # Streamlit Community Cloud compatible
-
+python==3.12
 # Core
 streamlit
 
